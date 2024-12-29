@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
+    "@azure/identity": "^4.5.0",
+    "@azure/storage-blob": "^12.26.0",
     "@playwright/test": "^1.49.1",
     "playwright": "^1.49.1"
   },

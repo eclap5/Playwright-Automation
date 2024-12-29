@@ -1,19 +1,29 @@
 import { Page } from 'playwright';
-import { formatDate } from '../utils/dateUtils';
-import { InvocationContext } from '@azure/functions';
+import LoggerService from './loggerService';
+import { compareMonths } from '../utils/dateUtils';
 
-const createBooking = async (page: Page, date: string, time: string, room: string, azureContext: InvocationContext): Promise<void> => {
+const createBooking = async (page: Page, date: string, time: string, room: string): Promise<void> => {
     const selectService = await page.waitForSelector('text="Student Union House"');
     await selectService.click();
+
+    const difference: number = compareMonths(date);
+
+    if (difference > 0) {
+        for (let i = 0; i < difference; i++) {
+            LoggerService.log("Selecting next month");
+            const nextMonth = page.getByLabel('Next month');
+            await nextMonth.click();
+        }
+    }
 
     const loadingIcon = page.getByLabel('Select a date.').locator('span');
 
     if (await loadingIcon.isVisible()) {
-        azureContext.log('Date picker is loading.');
+        LoggerService.log('Date picker is loading.');
         await loadingIcon.waitFor({ state: 'hidden' });
     }
 
-    await page.getByLabel(formatDate(date)).click();
+    await page.getByLabel(date).click();
 
     const roomSelector = await page.waitForSelector('text="Anyone"');
     await roomSelector.click();
@@ -41,7 +51,7 @@ const createBooking = async (page: Page, date: string, time: string, room: strin
 
     await page.getByRole('button', { name: 'New booking' }).click();
 
-    azureContext.log(`Booking created for ${date} at ${time} in ${room}.`);
+    LoggerService.log(`Booking created for ${date} at ${time} in ${room}.`);
 };
 
 export { createBooking };

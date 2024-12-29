@@ -1,11 +1,11 @@
-import { InvocationContext } from '@azure/functions';
 import { BrowserContext, Page } from 'playwright';
+import LoggerService from './loggerService';
 
-export const loadPage = async (context: BrowserContext, azureContext: InvocationContext): Promise<Page> => {
-    azureContext.log('Starting login process...');
+export const loadPage = async (context: BrowserContext): Promise<Page> => {
+    LoggerService.log('Starting login process...');
     const page: Page = await context.newPage();
 
-    await page.goto('https://outlook.office365.com/owa/calendar/StudentUnionHousereservations@lut.onmicrosoft.com/bookings/');
+    await page.goto(process.env.URL);
     
     const emailInput = await page.waitForSelector('input[name="loginfmt"]');
     await emailInput.fill(`${process.env.EMAIL}`);
@@ -25,7 +25,7 @@ export const loadPage = async (context: BrowserContext, azureContext: Invocation
     const staySignedInButton = await page.waitForSelector('text="Yes"');
     await staySignedInButton.click();
 
-    azureContext.log('Login successful.');
+    LoggerService.log('Login successful.');
 
     return page;
 };

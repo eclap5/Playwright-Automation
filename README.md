@@ -30,4 +30,17 @@ To run this project locally, you'll need:
 - [Azure Functions Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) (for Visual Studio Code)
 - [Azurite](https://github.com/Azure/Azurite) (for local Azure Storage emulation)
 
+## TroubleShooting
 
+If Azurite default ports are already in use, you can either change the ports or kill the processes using the following commands:
+
+Kill process:
+```bash
+netstat -ano | findstr <PORT_NUMBER>
+taskkill /PID <PID> /F
+```
+
+Change ports:
+```bash
+azurite --blobPort <PORT_NUMBER> --queuePort <PORT_NUMBER> --tablePort <PORT_NUMBER>
+```

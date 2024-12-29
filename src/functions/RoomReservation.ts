@@ -1,15 +1,29 @@
 import { app, InvocationContext, Timer } from "@azure/functions";
-import { runAutomation } from "../services/automation";
+import { runAutomation } from "../services/automationService";
+import LoggerService from "../services/loggerService";
+import { getReservationDate, setReservationDate } from "./common/blobStorageHelper";
+import { formatDate, addDays } from "../utils/dateUtils";
 
 export async function RoomReservation(myTimer: Timer, context: InvocationContext): Promise<void> {
-    context.log(`Timer function process executed at ${new Date().toISOString()}`);
+    LoggerService.setContext(context);
+    LoggerService.log(`Timer function process triggered at ${new Date().toISOString()}`);
 
     try {
-        context.log('Starting playwright automation...');
-        await runAutomation(context);
-        context.log('Playwright automation completed.');
+        LoggerService.log('Starting playwright automation.');
+
+        let strDate: string = await getReservationDate();
+
+        
+        for (let i = 0; i < parseInt(process.env.DAYS); i++) {
+            await runAutomation(formatDate(strDate));
+            strDate = addDays(strDate, 1);
+        }
+        
+        await setReservationDate(strDate);
+
+        LoggerService.log('Playwright automation completed.');
     } catch (error) {
-        context.error(`Error occurred: ${error}`);
+        LoggerService.error(`Error occurred: ${error}`);
     }
 }
 
