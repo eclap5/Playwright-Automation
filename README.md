@@ -27,7 +27,7 @@ To run this project locally, you'll need:
 - [TypeScript](https://www.typescriptlang.org/) (v4 or higher)
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended)
-- [Azure Functions Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) for Visual Studio Code
+- [Azure Functions Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) (for Visual Studio Code)
 - [Azurite](https://github.com/Azure/Azurite) (for local Azure Storage emulation)
 
 
