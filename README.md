@@ -29,6 +29,7 @@ To run this project locally, you'll need:
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended)
 - [Azure Functions Extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) (for Visual Studio Code)
 - [Azurite](https://github.com/Azure/Azurite) (for local Azure Storage emulation)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for general Azure management)
 
 ## TroubleShooting
 
