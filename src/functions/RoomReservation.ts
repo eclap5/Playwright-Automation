@@ -1,7 +1,7 @@
 import { app, InvocationContext, Timer } from "@azure/functions";
 import { runAutomation } from "../services/automationService";
-import LoggerService from "../services/loggerService";
-import { getReservationDate, setReservationDate } from "./common/blobStorageHelper";
+import LoggerService from "../common/loggerService";
+import { getReservationDate, setReservationDate } from "../common/blobStorageHandler";
 import { formatDate, addDays } from "../utils/dateUtils";
 
 export async function RoomReservation(myTimer: Timer, context: InvocationContext): Promise<void> {
@@ -12,7 +12,6 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
         LoggerService.log('Starting playwright automation.');
 
         let strDate: string = await getReservationDate();
-
         
         for (let i = 0; i < parseInt(process.env.DAYS); i++) {
             await runAutomation(formatDate(strDate));

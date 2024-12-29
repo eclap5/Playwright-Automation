@@ -1,8 +1,12 @@
 import { Page } from 'playwright';
-import LoggerService from './loggerService';
+import LoggerService from '../common/loggerService';
 import { compareMonths } from '../utils/dateUtils';
+import { getKeyVaultSecret } from '../common/credentialHandler';
 
 const createBooking = async (page: Page, date: string, time: string, room: string): Promise<void> => {
+    const fullName: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-fullname') : process.env.FULL_NAME;
+    const email: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-email') : process.env.EMAIL;
+
     const selectService = await page.waitForSelector('text="Student Union House"');
     await selectService.click();
 
@@ -34,13 +38,13 @@ const createBooking = async (page: Page, date: string, time: string, room: strin
     await page.locator(`text="${time}"`).click();
 
     const fullNameInput = page.getByPlaceholder('First and last name *'); 
-    if (fullNameInput.filter({ hasNotText: `${process.env.FULL_NAME}` })) {
-        await fullNameInput.fill(`${process.env.FULL_NAME}`);
+    if (fullNameInput.filter({ hasNotText: fullName })) {
+        await fullNameInput.fill(fullName);
     }
 
     const emailInput = page.getByPlaceholder('Email *');
-    if (emailInput.filter({ hasNotText: `${process.env.EMAIL}` })) {
-        await emailInput.fill(`${process.env.EMAIL}`);
+    if (emailInput.filter({ hasNotText: email })) {
+        await emailInput.fill(email);
     }
 
     const bookButton = await page.waitForSelector('text="Book"');

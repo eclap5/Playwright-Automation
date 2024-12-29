@@ -1,28 +1,30 @@
 import { BlobDownloadResponseParsed, BlobServiceClient, BlockBlobClient, ContainerClient } from "@azure/storage-blob";
-import LoggerService from "../../services/loggerService";
+import LoggerService from "./loggerService";
 
-const blobServiceClient: BlobServiceClient = BlobServiceClient.fromConnectionString(process.env.BLOB_STORAGE_CONNECTION_STRING);
-const containerName: string = process.env.BLOB_STORAGE_CONTAINER_NAME;
-const blobName: string = process.env.BLOB_STORAGE_BLOB_NAME;
+const getClient = (): BlockBlobClient => {
+    const blobServiceClient: BlobServiceClient = BlobServiceClient.fromConnectionString(process.env.BLOB_STORAGE_CONNECTION_STRING);
+    const containerName: string = process.env.BLOB_STORAGE_CONTAINER_NAME;
+    const blobName: string = process.env.BLOB_STORAGE_BLOB_NAME;
 
-const setReservationDate = async (date: string): Promise<void> => {
     const containerClient: ContainerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
     const blockBlobClient: BlockBlobClient = blobClient.getBlockBlobClient();
-    
+    return blockBlobClient;
+}
+
+const setReservationDate = async (date: string): Promise<void> => {
+    const blockBlobClient: BlockBlobClient = getClient();
     await blockBlobClient.upload(date, date.length);
-    LoggerService.log(`Date ${date} uploaded successfully to ${blobName}.`);
+    LoggerService.log(`Date ${date} uploaded successfully to ${blockBlobClient.name}.`);
 }
 
 const getReservationDate = async (): Promise<string> => {
-    const containerClient: ContainerClient = blobServiceClient.getContainerClient(containerName);
-    const blobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
-    const blockBlobClient: BlockBlobClient = blobClient.getBlockBlobClient();
+    const blockBlobClient: BlockBlobClient = getClient();
     
     const downloadBlockBlobResponse: BlobDownloadResponseParsed = await blockBlobClient.download();
     const downloaded: string = await streamToString(downloadBlockBlobResponse.readableStreamBody);
     
-    LoggerService.log(`Date ${downloaded} downloaded successfully from ${blobName}.`);
+    LoggerService.log(`Date ${downloaded} downloaded successfully from ${blockBlobClient.name}.`);
     
     return downloaded;
 }

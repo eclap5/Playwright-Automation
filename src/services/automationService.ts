@@ -2,7 +2,7 @@ import { Browser, BrowserContext, Page, chromium } from "playwright";
 import { createBooking } from "./bookingService";
 import { hours } from "../utils/constants";
 import { loadPage } from "./authService";
-import LoggerService from "./loggerService";
+import LoggerService from "../common/loggerService";
 import * as dotenv from "dotenv";
 
 dotenv.config();
