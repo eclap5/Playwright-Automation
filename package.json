@@ -15,8 +15,10 @@
     "@azure/identity": "^4.5.0",
     "@azure/keyvault-secrets": "^4.9.0",
     "@azure/storage-blob": "^12.26.0",
-    "@playwright/test": "^1.49.1",
-    "playwright": "^1.49.1"
+    "playwright": "^1.49.1",
+    "playwright-extra": "^4.3.6",
+    "puppeteer": "^23.11.1",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "devDependencies": {
     "@types/node": "^20.x",

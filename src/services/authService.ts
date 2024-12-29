@@ -2,13 +2,11 @@ import { BrowserContext, Page } from 'playwright';
 import LoggerService from '../common/loggerService';
 import { getKeyVaultSecret } from '../common/credentialHandler';
 
-export const loadPage = async (context: BrowserContext): Promise<Page> => {
+export const loadPage = async (page: Page): Promise<Page> => {
     LoggerService.log('Starting login process.');
 
     const email: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-email') : process.env.EMAIL;
     const password: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-password') : process.env.PASSWORD;
-
-    const page: Page = await context.newPage();
 
     await page.goto(process.env.URL);
     

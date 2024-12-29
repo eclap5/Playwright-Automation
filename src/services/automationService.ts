@@ -1,4 +1,6 @@
-import { Browser, BrowserContext, Page, chromium } from "playwright";
+import { Browser, BrowserContext, Page } from "playwright";
+import { chromium } from "playwright-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { createBooking } from "./bookingService";
 import { hours } from "../utils/constants";
 import { loadPage } from "./authService";
@@ -14,11 +16,14 @@ const runAutomation = async (date: string) => {
 
     LoggerService.log(`Starting automation for ${date}`);
 
-    const browser: Browser = await chromium.launch({ headless: false });
+    chromium.use(StealthPlugin());
+
+    const browser: Browser = await chromium.launch({ headless: process.env.NODE_ENV === 'production' ? true : false });
     const context: BrowserContext = await browser.newContext();
     context.setDefaultTimeout(600000);
 
-    const page: Page = await loadPage(context);
+    let page: Page = await context.newPage();
+    page = await loadPage(page);
 
     for (let i = 0; i < hours.length; i++) {
         await createBooking(page, date, hours[i], room);
