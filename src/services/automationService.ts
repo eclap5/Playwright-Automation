@@ -4,17 +4,14 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { createBooking } from "./bookingService";
 import { hours } from "../utils/constants";
 import { loadPage } from "./authService";
-import LoggerService from "../common/loggerService";
-import * as dotenv from "dotenv";
-
-dotenv.config();
+import LoggerHandler from "../handlers/loggerHandler";
 
 const runAutomation = async (date: string) => {
     const room: string = 'Yo Saimaa (6)';
     
     const startTime: number = new Date().getTime();
 
-    LoggerService.log(`Starting automation for ${date}`);
+    LoggerHandler.log(`Starting automation for ${date}`);
 
     chromium.use(StealthPlugin());
 
@@ -34,7 +31,7 @@ const runAutomation = async (date: string) => {
 
     const endTime: number = new Date().getTime();
 
-    LoggerService.log(`Workflow completed. Execution time: ${endTime - startTime}ms.`);
+    LoggerHandler.log(`Workflow completed. Execution time: ${endTime - startTime}ms.`);
 };
 
 export { runAutomation };

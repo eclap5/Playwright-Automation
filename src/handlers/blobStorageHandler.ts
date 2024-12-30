@@ -1,5 +1,5 @@
 import { BlobDownloadResponseParsed, BlobServiceClient, BlockBlobClient, ContainerClient } from "@azure/storage-blob";
-import LoggerService from "./loggerService";
+import LoggerHandler from "./loggerHandler";
 
 const getClient = (): BlockBlobClient => {
     const blobServiceClient: BlobServiceClient = BlobServiceClient.fromConnectionString(process.env.BLOB_STORAGE_CONNECTION_STRING);
@@ -15,7 +15,7 @@ const getClient = (): BlockBlobClient => {
 const setReservationDate = async (date: string): Promise<void> => {
     const blockBlobClient: BlockBlobClient = getClient();
     await blockBlobClient.upload(date, date.length);
-    LoggerService.log(`Date ${date} uploaded successfully to ${blockBlobClient.name}.`);
+    LoggerHandler.log(`Date ${date} uploaded successfully to ${blockBlobClient.name}.`);
 }
 
 const getReservationDate = async (): Promise<string> => {
@@ -24,7 +24,7 @@ const getReservationDate = async (): Promise<string> => {
     const downloadBlockBlobResponse: BlobDownloadResponseParsed = await blockBlobClient.download();
     const downloaded: string = await streamToString(downloadBlockBlobResponse.readableStreamBody);
     
-    LoggerService.log(`Date ${downloaded} downloaded successfully from ${blockBlobClient.name}.`);
+    LoggerHandler.log(`Date ${downloaded} downloaded successfully from ${blockBlobClient.name}.`);
     
     return downloaded;
 }

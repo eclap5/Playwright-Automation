@@ -1,9 +1,9 @@
-import { BrowserContext, Page } from 'playwright';
-import LoggerService from '../common/loggerService';
-import { getKeyVaultSecret } from '../common/credentialHandler';
+import { Page } from 'playwright';
+import LoggerHandler from '../handlers/loggerHandler';
+import { getKeyVaultSecret } from '../handlers/credentialHandler';
 
 export const loadPage = async (page: Page): Promise<Page> => {
-    LoggerService.log('Starting login process.');
+    LoggerHandler.log('Starting login process.');
 
     const email: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-email') : process.env.EMAIL;
     const password: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-password') : process.env.PASSWORD;
@@ -28,7 +28,7 @@ export const loadPage = async (page: Page): Promise<Page> => {
     const staySignedInButton = await page.waitForSelector('text="Yes"');
     await staySignedInButton.click();
 
-    LoggerService.log('Login successful.');
+    LoggerHandler.log('Login successful.');
 
     return page;
 };

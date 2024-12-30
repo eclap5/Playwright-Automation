@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
-import LoggerService from '../common/loggerService';
+import LoggerHandler from '../handlers/loggerHandler';
 import { compareMonths } from '../utils/dateUtils';
-import { getKeyVaultSecret } from '../common/credentialHandler';
+import { getKeyVaultSecret } from '../handlers/credentialHandler';
 
 const createBooking = async (page: Page, date: string, time: string, room: string): Promise<void> => {
     const fullName: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-fullname') : process.env.FULL_NAME;
@@ -14,7 +14,7 @@ const createBooking = async (page: Page, date: string, time: string, room: strin
 
     if (difference > 0) {
         for (let i = 0; i < difference; i++) {
-            LoggerService.log("Selecting next month");
+            LoggerHandler.log("Selecting next month");
             const nextMonth = page.getByLabel('Next month');
             await nextMonth.click();
         }
@@ -23,7 +23,7 @@ const createBooking = async (page: Page, date: string, time: string, room: strin
     const loadingIcon = page.getByLabel('Select a date.').locator('span');
 
     if (await loadingIcon.isVisible()) {
-        LoggerService.log('Date picker is loading.');
+        LoggerHandler.log('Date picker is loading.');
         await loadingIcon.waitFor({ state: 'hidden' });
     }
 
@@ -55,7 +55,7 @@ const createBooking = async (page: Page, date: string, time: string, room: strin
 
     await page.getByRole('button', { name: 'New booking' }).click();
 
-    LoggerService.log(`Booking created for ${date} at ${time} in ${room}.`);
+    LoggerHandler.log(`Booking created for ${date} at ${time} in ${room}.`);
 };
 
 export { createBooking };

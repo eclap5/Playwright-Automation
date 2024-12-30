@@ -1,6 +1,6 @@
 import { InvocationContext } from "@azure/functions";
 
-class LoggerService {
+class LoggerHandler {
     private static context: InvocationContext | null = null;
 
     public static setContext(context: InvocationContext): void {
@@ -24,4 +24,4 @@ class LoggerService {
     }
 }
 
-export default LoggerService;
+export default LoggerHandler;
