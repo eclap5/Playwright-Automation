@@ -30,7 +30,7 @@ jobs:
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
-          npx playwright install # install browsers binaries for playwright
+          npx playwright install
           npm run build --if-present
           npm run test --if-present
           popd
