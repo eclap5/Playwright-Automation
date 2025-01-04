@@ -25,16 +25,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: bash
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm install
-          npx playwright install --with-deps
-          npm run build --if-present
-          npm run test --if-present
-          popd
-
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
@@ -74,4 +64,6 @@ jobs:
           app-name: 'playwright-reservation-func'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        env:
+          ENABLE_ORYX_BUILD: true
           
