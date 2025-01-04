@@ -14,8 +14,12 @@ env:
   NODE_VERSION: '20' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write #This is required for requesting the JWT
+
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
@@ -24,41 +28,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: bash
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          npm install
-          npx playwright install --with-deps
-          npm run build --if-present
-          npm run test --if-present
-          popd
-
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: release.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    
-    permissions:
-      id-token: write #This is required for requesting the JWT
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -74,4 +43,6 @@ jobs:
           app-name: 'playwright-reservation-func'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        env:
+          ENABLE_ORYX_BUILD: true
           
