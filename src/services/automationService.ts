@@ -15,7 +15,10 @@ const runAutomation = async (date: string) => {
 
     chromium.use(StealthPlugin());
 
-    const browser: Browser = await chromium.launch({ headless: process.env.NODE_ENV === 'production' ? true : false });
+    const browser: Browser = await chromium.launch({ 
+        headless: process.env.NODE_ENV === 'production' ? true : false,
+        args: ['--no-sandbox']
+    });
     const context: BrowserContext = await browser.newContext();
     context.setDefaultTimeout(600000);
 

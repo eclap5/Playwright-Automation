@@ -40,7 +40,12 @@ jobs:
           popd
 
       - name: Add execution permissions to chromium binary
-        run: chmod +x ./node_modules/playwright-core/.local-browsers/chromium_headless_shell-*/chrome-linux/headless_shell
+        run: |
+          chmod +x ./node_modules/playwright-core/.local-browsers/chromium_headless_shell-*/chrome-linux/headless_shell
+
+      - name: Check permissions of chromium binary
+        run: |
+          ls -l ./node_modules/playwright-core/.local-browsers/chromium_headless_shell-*/chrome-linux/headless_shell
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
