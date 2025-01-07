@@ -3,38 +3,63 @@ import { chromium } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { createBooking } from "./bookingService";
 import { hours } from "../utils/constants";
-import { loadPage } from "./authService";
 import LoggerHandler from "../handlers/loggerHandler";
+import { TPlaywrightObject } from "../types/types";
+import { saveErrorData } from "../handlers/blobStorageHandler";
 
-const runAutomation = async (date: string) => {
-    const room: string = 'Yo Saimaa (6)';
-    
+const runAutomation = async (page: Page, date: string, room: string): Promise<string[]> => {    
     const startTime: number = new Date().getTime();
 
     LoggerHandler.log(`Starting automation for ${date}`);
 
-    chromium.use(StealthPlugin());
+    if (page.url() !== process.env.URL) {
+        LoggerHandler.log('Page not loaded. Redirecting.');
+        await page.goto(process.env.URL);
+    }
 
+    const reservedHours: string[] = [];
+
+    for (let i = 0; i < hours.length; i++) {
+        try {
+            await createBooking(page, date, hours[i], room);
+            reservedHours.push(hours[i]);
+        } catch (error: any) {
+            const msg: string = `Error occurred while creating reservation for ${date} at ${hours[i]} in room ${room}: ${error}`;
+            LoggerHandler.error(msg);
+            await saveErrorData(msg);
+        }
+    }
+
+    const endTime: number = new Date().getTime();
+
+    LoggerHandler.log(`Workflow completed. Execution time: ${endTime - startTime}ms.`);
+
+    return hours;
+};
+
+const initializeBrowserContext = async (): Promise<TPlaywrightObject> => {
+    chromium.use(StealthPlugin());
+    
     const browser: Browser = await chromium.launch({ 
         headless: process.env.NODE_ENV === 'production' ? true : false,
         args: ['--no-sandbox']
     });
     const context: BrowserContext = await browser.newContext();
+    
     context.setDefaultTimeout(600000);
-
     let page: Page = await context.newPage();
-    page = await loadPage(page);
 
-    for (let i = 0; i < hours.length; i++) {
-        await createBooking(page, date, hours[i], room);
-    }
+    LoggerHandler.log('Playwright objects initialized.');
 
-    await context.close();
-    await browser.close();
+    return { page, context, browser };
+}
 
-    const endTime: number = new Date().getTime();
+const terminateBrowserContext = async (playwrightObject: TPlaywrightObject): Promise<void> => {
+    await playwrightObject.page.close();
+    await playwrightObject.context.close();
+    await playwrightObject.browser.close();
 
-    LoggerHandler.log(`Workflow completed. Execution time: ${endTime - startTime}ms.`);
-};
+    LoggerHandler.log('Playwright objects terminated.');
+}
 
-export { runAutomation };
+export { runAutomation, initializeBrowserContext, terminateBrowserContext };

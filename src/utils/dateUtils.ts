@@ -1,3 +1,9 @@
+/**
+ * @param strDate 
+ * @param locale default is 'en-US'
+ * @returns formatted date string in the format 'Weekday, Month Day, Year.'
+ * @example formatDate('2022-01-01', 'en-US') // Saturday, January 1, 2022.
+ */
 const formatDate = (strDate: string, locale: string = 'en-US'): string => {
     const date: Date = new Date(strDate);
 
@@ -24,6 +30,20 @@ const addDays = (strDate: string, days: number): string => {
     return `${year}-${month}-${day}`;
 }
 
+// Returns the current date in the format 'YYYY-MM-DD'.
+const getCurrentDate = (): string => {
+    const today: Date = new Date();
+    const year: number = today.getFullYear();
+    const month: string = String(today.getMonth() + 1).padStart(2, '0');
+    const day: string = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+/**
+ * @param month target month as string
+ * @returns the difference between the current month and the target month as a number
+ */
 const compareMonths = (month: string): number => {
     const today: Date = new Date();
     const currentMonth: number = today.getMonth() + 1;
@@ -37,4 +57,4 @@ const compareMonths = (month: string): number => {
     return difference;
 }
 
-export { formatDate, addDays, compareMonths };
+export { formatDate, addDays, compareMonths, getCurrentDate };

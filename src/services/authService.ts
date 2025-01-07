@@ -2,12 +2,12 @@ import { Page } from 'playwright';
 import LoggerHandler from '../handlers/loggerHandler';
 import { getKeyVaultSecret } from '../handlers/credentialHandler';
 
-export const loadPage = async (page: Page): Promise<Page> => {
+const login = async (page: Page): Promise<Page> => {
     LoggerHandler.log('Starting login process.');
 
     const email: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-email') : process.env.EMAIL;
     const password: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-password') : process.env.PASSWORD;
-
+    
     await page.goto(process.env.URL);
     
     const emailInput = await page.waitForSelector('input[name="loginfmt"]');
@@ -31,4 +31,6 @@ export const loadPage = async (page: Page): Promise<Page> => {
     LoggerHandler.log('Login successful.');
 
     return page;
-};
+}
+
+export { login };
