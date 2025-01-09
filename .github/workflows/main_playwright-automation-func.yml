@@ -29,7 +29,8 @@ jobs:
         shell: bash
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          PLAYWRIGHT_BROWSERS_PATH=0 npm install
+          npm install --ignore-scripts
+          PLAYWRIGHT_BROWSERS_PATH=0 npm run postinstall
           npm run build --if-present
           npm run test --if-present
           popd
