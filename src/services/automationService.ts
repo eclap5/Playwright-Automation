@@ -12,7 +12,7 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
 
     LoggerHandler.log(`Starting automation for ${date}`);
 
-    if (page.url() !== process.env.TARGET_URL) {
+    if (!page.url().includes(process.env.TARGET_URL)) {
         LoggerHandler.log('Page not loaded. Redirecting.');
         await page.goto(process.env.TARGET_URL);
     }
