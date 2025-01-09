@@ -12,21 +12,20 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
 
     LoggerHandler.log(`Starting automation for ${date}`);
 
-    if (!page.url().includes(process.env.TARGET_URL)) {
-        LoggerHandler.log('Page not loaded. Redirecting.');
-        await page.goto(process.env.TARGET_URL);
-    }
-
     const reservedHours: string[] = [];
 
     for (let i = 0; i < hours.length; i++) {
         try {
-            await createBooking(page, date, hours[i], room);
-            reservedHours.push(hours[i]);
+            const success = await createBooking(page, date, hours[i], room);
+            if (success)
+                reservedHours.push(hours[i]);
         } catch (error: any) {
             const msg: string = `Error occurred while creating reservation for ${date} at ${hours[i]} in room ${room}: ${error}`;
             LoggerHandler.error(msg);
             await saveErrorData(msg);
+            
+            if (error.message.includes('Unavailable'))
+                return reservedHours;
         }
     }
 
@@ -45,7 +44,7 @@ const initializeBrowserContext = async (): Promise<TPlaywrightObject> => {
     });
     const context: BrowserContext = await browser.newContext();
     
-    context.setDefaultTimeout(600000);
+    context.setDefaultTimeout(60000);
     let page: Page = await context.newPage();
 
     LoggerHandler.log('Playwright objects initialized.');
