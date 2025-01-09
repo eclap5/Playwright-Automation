@@ -23,7 +23,7 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
 
         playwrightObject.page = await login(playwrightObject.page);
 
-        for (let i = 0; i < parseInt(process.env.DAYS); i++) {
+        for (let i = 0; i < parseInt(process.env.TARGET_DAYS); i++) {
             const reservedHours: string[] = await runAutomation(playwrightObject.page, formatDate(strDate), room);
 
             const reservationData: TReservationData = {
