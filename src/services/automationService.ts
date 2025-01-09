@@ -12,9 +12,9 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
 
     LoggerHandler.log(`Starting automation for ${date}`);
 
-    if (page.url() !== process.env.URL) {
+    if (page.url() !== process.env.TARGET_URL) {
         LoggerHandler.log('Page not loaded. Redirecting.');
-        await page.goto(process.env.URL);
+        await page.goto(process.env.TARGET_URL);
     }
 
     const reservedHours: string[] = [];
@@ -41,8 +41,7 @@ const initializeBrowserContext = async (): Promise<TPlaywrightObject> => {
     chromium.use(StealthPlugin());
     
     const browser: Browser = await chromium.launch({ 
-        headless: process.env.NODE_ENV === 'production' ? true : false,
-        args: ['--no-sandbox']
+        headless: process.env.NODE_ENV === 'production' ? true : false
     });
     const context: BrowserContext = await browser.newContext();
     

@@ -17,7 +17,7 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
         LoggerHandler.log('Starting playwright automation.');
 
         let strDate: string = await getReservationDate();
-        const room: string = process.env.ROOM;
+        const room: string = process.env.TARGET_ROOM;
         
         const playwrightObject: TPlaywrightObject = await initializeBrowserContext();
 
@@ -49,6 +49,6 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
 }
 
 app.timer('RoomReservation', {
-    schedule: process.env.TIMER,
+    schedule: process.env.TIMER_INTERVAL,
     handler: RoomReservation
 });

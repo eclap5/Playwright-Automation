@@ -8,7 +8,7 @@ const login = async (page: Page): Promise<Page> => {
     const email: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-email') : process.env.EMAIL;
     const password: string = process.env.NODE_ENV === 'production' ? await getKeyVaultSecret('user-password') : process.env.PASSWORD;
     
-    await page.goto(process.env.URL);
+    await page.goto(process.env.TARGET_URL);
     
     const emailInput = await page.waitForSelector('input[name="loginfmt"]');
     await emailInput.fill(email);
