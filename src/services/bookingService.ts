@@ -51,7 +51,7 @@ const createBooking = async (page: Page, date: string, time: string, room: strin
     }
     await timeSlot.click();
 
-    const fullNameInput = page.getByPlaceholder('First and last name *'); 
+    const fullNameInput = page.getByPlaceholder('First and last name *');
     if (fullNameInput.filter({ hasNotText: fullName })) {
         await fullNameInput.fill(fullName);
     }

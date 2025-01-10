@@ -16,16 +16,18 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
 
     for (let i = 0; i < hours.length; i++) {
         try {
-            const success = await createBooking(page, date, hours[i], room);
-            if (success)
+            const success: boolean = await createBooking(page, date, hours[i], room);
+            if (success) {
                 reservedHours.push(hours[i]);
+            }
         } catch (error: any) {
             const msg: string = `Error occurred while creating reservation for ${date} at ${hours[i]} in room ${room}: ${error}`;
             LoggerHandler.error(msg);
             await saveErrorData(msg);
             
-            if (error.message.includes('Unavailable'))
+            if (error.message.includes('Unavailable')) {
                 return reservedHours;
+            }
         }
     }
 
@@ -33,7 +35,7 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
 
     LoggerHandler.log(`Workflow completed. Execution time: ${endTime - startTime}ms.`);
 
-    return hours;
+    return reservedHours;
 };
 
 const initializeBrowserContext = async (): Promise<TPlaywrightObject> => {
