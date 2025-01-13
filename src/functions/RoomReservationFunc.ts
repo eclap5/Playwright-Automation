@@ -42,9 +42,9 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
         await terminateBrowserContext(playwrightObject);
 
         LoggerHandler.log('Playwright automation completed.');
-    } catch (error) {
+    } catch (error: any) {
         LoggerHandler.error(`Error occurred: ${error}`);
-        await saveErrorData(error);
+        await saveErrorData(String(error));
     }
 }
 

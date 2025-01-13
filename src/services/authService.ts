@@ -35,7 +35,7 @@ const login = async (page: Page): Promise<Page> => {
     } catch (error: any) {
         const msg: string = `Error occurred while logging in: ${error}`;
         LoggerHandler.error(msg);
-        throw new Error(msg);   
+        throw new Error(msg);
     }
 }
 
