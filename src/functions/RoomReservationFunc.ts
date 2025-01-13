@@ -50,5 +50,12 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
 
 app.timer('RoomReservation', {
     schedule: process.env.TIMER_INTERVAL,
+    retry: {
+        strategy: 'fixedDelay',
+        delayInterval: {
+            minutes: 15
+        },
+        maxRetryCount: 3
+    },
     handler: RoomReservation
 });
