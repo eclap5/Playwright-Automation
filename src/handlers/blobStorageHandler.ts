@@ -10,13 +10,13 @@ const getBlobClient = (containerName: string, blobName: string): BlockBlobClient
 }
 
 const setReservationDate = async (date: string): Promise<void> => {
-    const blockBlobClient: BlockBlobClient = getBlobClient(process.env.CONTAINER_NAME, process.env.BLOB_NAME);
+    const blockBlobClient: BlockBlobClient = getBlobClient(process.env.STORAGE_CONTAINER_NAME, process.env.BLOB_NAME);
     await blockBlobClient.upload(date, date.length);
     LoggerHandler.log(`Date ${date} uploaded successfully to ${blockBlobClient.name}.`);
 }
 
 const getReservationDate = async (): Promise<string> => {
-    const blockBlobClient: BlockBlobClient = getBlobClient(process.env.CONTAINER_NAME, process.env.BLOB_NAME);
+    const blockBlobClient: BlockBlobClient = getBlobClient(process.env.STORAGE_CONTAINER_NAME, process.env.BLOB_NAME);
     const downloadBlockBlobResponse: BlobDownloadResponseParsed = await blockBlobClient.download();
     const downloaded: string = await streamToString(downloadBlockBlobResponse.readableStreamBody);
     
@@ -37,7 +37,7 @@ const streamToString = async (readableStream: NodeJS.ReadableStream): Promise<st
 const saveReservationData = async (data: string, date: string): Promise<void> => {
     const folderName: string = getYearMonthFolderName();
     const blobName: string = `Reservation-${date}.json`;
-    const blobClient: BlockBlobClient = getBlobClient(process.env.CONTAINER_NAME, `${folderName}/${blobName}`);
+    const blobClient: BlockBlobClient = getBlobClient(process.env.STORAGE_CONTAINER_NAME, `${folderName}/${blobName}`);
 
     await blobClient.upload(data, data.length);
     LoggerHandler.log(`Reservation data uploaded successfully to ${blobClient.name}.`);
