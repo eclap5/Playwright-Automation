@@ -45,6 +45,7 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
     } catch (error: any) {
         LoggerHandler.error(`Error occurred: ${error}`);
         await saveErrorData(String(error));
+        throw error; // Rethrow the error to trigger the retry policy
     }
 }
 
