@@ -4,7 +4,7 @@ import LoggerHandler from "../handlers/loggerHandler";
 import { getReservationDate, setReservationDate, saveReservationData, saveErrorData } from "../handlers/blobStorageHandler";
 import { formatDate, addDays } from "../utils/dateUtils";
 import * as dotenv from "dotenv";
-import { TPlaywrightObject, TReservationData } from "../types/types";
+import { TPlaywrightObject, TReservationData, TResultMap } from "../types/types";
 import { login } from "../services/authService";
 
 export async function RoomReservation(myTimer: Timer, context: InvocationContext): Promise<void> {
@@ -17,19 +17,18 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
         LoggerHandler.log('Starting playwright automation.');
 
         let strDate: string = await getReservationDate();
-        const room: string = process.env.TARGET_ROOM;
         
         const playwrightObject: TPlaywrightObject = await initializeBrowserContext();
 
         playwrightObject.page = await login(playwrightObject.page);
 
         for (let i = 0; i < parseInt(process.env.TARGET_DAYS); i++) {
-            const reservedHours: string[] = await runAutomation(playwrightObject.page, formatDate(strDate), room);
+            const reservation: TResultMap = await runAutomation(playwrightObject.page, formatDate(strDate));
 
             const reservationData: TReservationData = {
-                room: room,
+                room: reservation.room,
                 date: strDate,
-                reservedHours: reservedHours
+                reservedHours: reservation.hours
             }; 
 
             const data: string = JSON.stringify(reservationData);
@@ -45,7 +44,7 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
     } catch (error: any) {
         LoggerHandler.error(`Error occurred: ${error}`);
         await saveErrorData(String(error));
-        throw error; // Rethrow the error to trigger the retry policy
+        throw error; // Rethrow the error to trigger retry policy
     }
 }
 

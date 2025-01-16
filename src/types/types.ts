@@ -12,4 +12,9 @@ type TPlaywrightObject = {
     browser: Browser;
 };
 
-export { TReservationData, TPlaywrightObject };
+type TResultMap = {
+    room: string;
+    hours: string[];
+}
+
+export { TReservationData, TPlaywrightObject, TResultMap };

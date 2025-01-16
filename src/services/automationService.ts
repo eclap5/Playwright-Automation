@@ -4,21 +4,28 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { createBooking } from "./bookingService";
 import { hours } from "../utils/constants";
 import LoggerHandler from "../handlers/loggerHandler";
-import { TPlaywrightObject } from "../types/types";
+import { TPlaywrightObject, TResultMap } from "../types/types";
 import { saveErrorData } from "../handlers/blobStorageHandler";
+import { selectRoom } from "./roomService";
 
-const runAutomation = async (page: Page, date: string, room: string): Promise<string[]> => {    
+const runAutomation = async (page: Page, date: string): Promise<TResultMap> => {
     const startTime: number = new Date().getTime();
 
     LoggerHandler.log(`Starting automation for ${date}`);
 
-    const reservedHours: string[] = [];
+    const result: TResultMap = {
+        room: '',
+        hours: []
+    };
+
+    const room: string = await selectRoom(page, date);
+    result.room = room;
 
     for (let i = 0; i < hours.length; i++) {
         try {
             const success: boolean = await createBooking(page, date, hours[i], room);
             if (success) {
-                reservedHours.push(hours[i]);
+                result.hours.push(hours[i]);
             }
         } catch (error: any) {
             const msg: string = `Error occurred while creating reservation for ${date} at ${hours[i]} in room ${room}: ${error}`;
@@ -26,7 +33,7 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
             await saveErrorData(msg);
             
             if (error.message.includes('Unavailable')) {
-                return reservedHours;
+                return result;
             }
         }
     }
@@ -35,7 +42,7 @@ const runAutomation = async (page: Page, date: string, room: string): Promise<st
 
     LoggerHandler.log(`Workflow completed. Execution time: ${endTime - startTime}ms.`);
 
-    return reservedHours;
+    return result;
 };
 
 const initializeBrowserContext = async (): Promise<TPlaywrightObject> => {
