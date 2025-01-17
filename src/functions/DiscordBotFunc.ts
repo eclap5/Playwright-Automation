@@ -33,7 +33,6 @@ export async function DiscordBot(blob: Buffer, context: InvocationContext): Prom
 
         if (channel instanceof TextChannel) {
             await channel.send(message);
-            LoggerHandler.log('Message sent successfully to Discord channel.');
         }
     } catch (error: any) {
         LoggerHandler.error(`Error occurred: ${error}`);

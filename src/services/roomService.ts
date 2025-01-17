@@ -71,8 +71,6 @@ const selectRoom = async (page: Page, date: string): Promise<string> => {
         await roomSelector.click();
     }
 
-    LoggerHandler.log(`Map object: ${JSON.stringify(map)}`);
-
     // sort map by most available hours
     const room: string = map.reduce((maxItem, currentItem) => {
         return currentItem.hours.length > maxItem.hours.length ? currentItem : maxItem;
