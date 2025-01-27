@@ -12,9 +12,9 @@ const hours: string[] = [
 ]
 
 const rooms: string[] = [
-    'Yo Kuivatyöstö (6)',
     'Yo Saimaa (6)',
     'Yo Wappu (6)',
+    'Yo Kuivatyöstö (6)',
     'Yo Uni (6)',
     'Yo Gif (6)',
     'Yo Reaktori (6)'
