@@ -1,6 +1,6 @@
 import { BlobDownloadResponseParsed, BlobServiceClient, BlockBlobClient, ContainerClient } from "@azure/storage-blob";
 import LoggerHandler from "./loggerHandler";
-import { getCurrentDate, getYearMonthFolderName } from "../utils/dateUtils";
+import { getYearMonthFolderName } from "../utils/dateUtils";
 
 const getBlobClient = (containerName: string, blobName: string): BlockBlobClient => {
     const blobServiceClient: BlobServiceClient = BlobServiceClient.fromConnectionString(process.env.STORAGE_CONNECTION_STRING);
@@ -44,7 +44,7 @@ const saveReservationData = async (data: string, date: string): Promise<void> =>
 }
 
 const saveErrorData = async (data: string): Promise<void> => {
-    const blobName: string = `Error-${getCurrentDate()}.json`;
+    const blobName: string = `Error-${new Date().toISOString()}.json`;
     const blobClient: BlockBlobClient = getBlobClient(process.env.ERROR_CONTAINER_NAME, blobName);
 
     await blobClient.upload(data, data.length);

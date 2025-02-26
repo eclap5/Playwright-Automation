@@ -4,6 +4,11 @@ import { compareMonths } from "../utils/dateUtils";
 import { rooms, hours } from "../utils/constants";
 import { TResultMap } from "../types/types";
 
+/**
+ * Navigates to the selected date in the datepicker element.
+ * @param page - Playwright Page object.
+ * @param date - Selected date.
+ */
 const navigateToDate = async (page: Page, date: string): Promise<void> => {
     const difference: number = compareMonths(date);
 
@@ -31,26 +36,33 @@ const navigateToDate = async (page: Page, date: string): Promise<void> => {
     await dateSlot.click();
 }
 
+/**
+ * Maps through all rooms, and stores the rooms and their available hours into a dictionary.
+ * @param page - Playwright Page object.
+ * @returns A TResultMap[] List object which contains all available rooms and hours. 
+ */
 const mapRooms = async (page: Page): Promise<TResultMap[]> => {
     const map: TResultMap[] = [];
 
-    let roomSelector = await page.waitForSelector('text="Anyone"');
+    let roomSelector = page.getByLabel('Select a staff member (optional). Selected staff: Anyone.');
 
+    // Loop through all available rooms.
     for (const room of rooms) {
         await roomSelector.click();
 
-        const selectRoom = await page.waitForSelector(`text="${room}"`);
+        const selectRoom = page.getByText(room);
         await selectRoom.click();
 
+        // Loop through all hours and checks the availability.
         for (const hour of hours) {
             const timeSlot = page.locator(`text="${hour}"`);
 
             if (await timeSlot.isVisible()) {
-                let roomEntry: TResultMap = map.find((entry) => entry.room === hour);
+                let roomEntry: TResultMap | null = map.find((entry) => entry.room === room) || null;
 
                 if (!roomEntry) {
-                    const roomEntry: TResultMap = {
-                        room: hour,
+                    roomEntry = {
+                        room: room,
                         hours: []
                     };
                     map.push(roomEntry);
@@ -61,12 +73,17 @@ const mapRooms = async (page: Page): Promise<TResultMap[]> => {
                 }
             }
         }
-        roomSelector = await page.waitForSelector(`text="${room}"`);
-        await roomSelector.click();
+        roomSelector = page.getByRole("button", { name: room })
     }
     return map;
 }
 
+/**
+ * Selects the room based on most available hours.
+ * @param page - Playwright Page object.
+ * @param date - Selected date.
+ * @returns The selected room as a string.
+ */
 const selectRoom = async (page: Page, date: string): Promise<string> => {
     LoggerHandler.log(`Selecting room for ${date}`);
 
