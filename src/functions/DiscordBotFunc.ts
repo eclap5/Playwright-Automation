@@ -1,5 +1,5 @@
 import { app, InvocationContext } from "@azure/functions";
-import { Channel, Client, Message, TextChannel } from "discord.js";
+import { Channel, Client, TextChannel } from "discord.js";
 import LoggerHandler from "../handlers/loggerHandler";
 import { TReservationData } from "../types/types";
 import * as dotenv from "dotenv";
@@ -8,7 +8,7 @@ import { saveErrorData } from "../handlers/blobStorageHandler";
 export async function DiscordBot(blob: Buffer, context: InvocationContext): Promise<void> {
     dotenv.config();
     LoggerHandler.setContext(context);
-    LoggerHandler.log(`Storage blob function processed blob "${context.triggerMetadata.name}" with size ${blob.length} bytes`);
+    LoggerHandler.log(`Storage blob function processed blob "${context.triggerMetadata.name as string}" with size ${blob.length} bytes`);
     
     const botToken: string = process.env.DISCORD_BOT_TOKEN;
     const channelId: string = process.env.DISCORD_CHANNEL_ID;

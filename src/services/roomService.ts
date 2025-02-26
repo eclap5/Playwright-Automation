@@ -4,17 +4,7 @@ import { compareMonths } from "../utils/dateUtils";
 import { rooms, hours } from "../utils/constants";
 import { TResultMap } from "../types/types";
 
-
-const selectRoom = async (page: Page, date: string): Promise<string> => {
-    LoggerHandler.log(`Selecting room for ${date}`);
-
-    const map: TResultMap[] = [];
-
-    await page.goto(process.env.TARGET_URL);
-
-    const selectService = await page.waitForSelector('text="Student Union House"');
-    await selectService.click();
-
+const navigateToDate = async (page: Page, date: string): Promise<void> => {
     const difference: number = compareMonths(date);
 
     if (difference > 0) {
@@ -39,37 +29,54 @@ const selectRoom = async (page: Page, date: string): Promise<string> => {
         throw new Error(msg);
     }
     await dateSlot.click();
+}
+
+const mapRooms = async (page: Page): Promise<TResultMap[]> => {
+    const map: TResultMap[] = [];
 
     let roomSelector = await page.waitForSelector('text="Anyone"');
 
-    for (let i = 0; i < rooms.length; i++) {
+    for (const room of rooms) {
         await roomSelector.click();
 
-        const selectRoom = await page.waitForSelector(`text="${rooms[i]}"`);
+        const selectRoom = await page.waitForSelector(`text="${room}"`);
         await selectRoom.click();
 
-        for (let j = 0; j < hours.length; j++) {
-            const timeSlot = page.locator(`text="${hours[j]}"`);
+        for (const hour of hours) {
+            const timeSlot = page.locator(`text="${hour}"`);
 
             if (await timeSlot.isVisible()) {
-                let roomEntry: TResultMap = map.find((entry) => entry.room === rooms[i]);
+                let roomEntry: TResultMap = map.find((entry) => entry.room === hour);
 
                 if (!roomEntry) {
-                    roomEntry = {
-                        room: rooms[i],
+                    const roomEntry: TResultMap = {
+                        room: hour,
                         hours: []
                     };
                     map.push(roomEntry);
                 }
 
-                if (!roomEntry.hours.includes(hours[j])) {
-                    roomEntry.hours.push(hours[j]);
+                if (!roomEntry.hours.includes(hour)) {
+                    roomEntry.hours.push(hour);
                 }
             }
         }
-        roomSelector = await page.waitForSelector(`text="${rooms[i]}"`);
+        roomSelector = await page.waitForSelector(`text="${room}"`);
         await roomSelector.click();
     }
+    return map;
+}
+
+const selectRoom = async (page: Page, date: string): Promise<string> => {
+    LoggerHandler.log(`Selecting room for ${date}`);
+
+    await page.goto(process.env.TARGET_URL);
+
+    const selectService = await page.waitForSelector('text="Student Union House"');
+    await selectService.click();
+
+    await navigateToDate(page, date);
+    const map: TResultMap[] = await mapRooms(page);
 
     // sort map by most available hours
     const room: string = map.reduce((maxItem, currentItem) => {

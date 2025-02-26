@@ -21,14 +21,14 @@ const runAutomation = async (page: Page, date: string): Promise<TResultMap> => {
     const room: string = await selectRoom(page, date);
     result.room = room;
 
-    for (let i = 0; i < hours.length; i++) {
+    for (const hour of hours) {
         try {
-            const success: boolean = await createBooking(page, date, hours[i], room);
+            const success: boolean = await createBooking(page, date, hour, room);
             if (success) {
-                result.hours.push(hours[i]);
+                result.hours.push(hour);
             }
         } catch (error: any) {
-            const msg: string = `Error occurred while creating reservation for ${date} at ${hours[i]} in room ${room}: ${error}`;
+            const msg: string = `Error occurred while creating reservation for ${date} at ${hour} in room ${room}: ${error}`;
             LoggerHandler.error(msg);
             await saveErrorData(msg);
             
@@ -49,7 +49,7 @@ const initializeBrowserContext = async (): Promise<TPlaywrightObject> => {
     chromium.use(StealthPlugin());
     
     const browser: Browser = await chromium.launch({ 
-        headless: process.env.NODE_ENV === 'production' ? true : false
+        headless: process.env.NODE_ENV === 'production'
     });
     const context: BrowserContext = await browser.newContext();
     
