@@ -3,22 +3,21 @@ import { runAutomation, initializeBrowserContext, terminateBrowserContext } from
 import LoggerHandler from "../handlers/loggerHandler";
 import { getReservationDate, setReservationDate, saveReservationData, saveErrorData } from "../handlers/blobStorageHandler";
 import { formatDate, addDays } from "../utils/dateUtils";
-import * as dotenv from "dotenv";
 import { TPlaywrightObject, TReservationData, TResultMap } from "../types/types";
 import { login } from "../services/authService";
 
 export async function RoomReservation(myTimer: Timer, context: InvocationContext): Promise<void> {
-    dotenv.config();
-    
-    LoggerHandler.setContext(context);
-    LoggerHandler.log(`Timer function process triggered at ${new Date().toISOString()}`);
 
+    LoggerHandler.setContext(context);
+    let playwrightObject: TPlaywrightObject = null;
+    
     try {
+        LoggerHandler.log(`Timer function process triggered at ${new Date().toISOString()}`);
         LoggerHandler.log('Starting playwright automation.');
 
         let strDate: string = await getReservationDate();
         
-        const playwrightObject: TPlaywrightObject = await initializeBrowserContext();
+        playwrightObject = await initializeBrowserContext();
 
         playwrightObject.page = await login(playwrightObject.page);
 
@@ -38,13 +37,16 @@ export async function RoomReservation(myTimer: Timer, context: InvocationContext
             await setReservationDate(strDate);
         }
         
-        await terminateBrowserContext(playwrightObject);
-
         LoggerHandler.log('Playwright automation completed.');
     } catch (error: any) {
         LoggerHandler.error(`Error occurred: ${error}`);
         await saveErrorData(String(error));
         throw error; // Rethrow the error to trigger retry policy
+    } finally {
+        if (playwrightObject) {
+            await terminateBrowserContext(playwrightObject);
+        }
+        LoggerHandler.deactivateContext();
     }
 }
 
